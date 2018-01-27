@@ -1,0 +1,301 @@
+[
+  {
+    "class" : "View",
+    "attributes" : {
+      "custom_class" : "",
+      "background_color" : "RGBA(1.000000,1.000000,1.000000,1.000000)",
+      "tint_color" : "RGBA(0.000000,0.478000,1.000000,1.000000)",
+      "enabled" : true,
+      "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+      "flex" : ""
+    },
+    "frame" : "{{0, 0}, {1024, 768}}",
+    "selected" : false,
+    "nodes" : [
+      {
+        "class" : "ImageView",
+        "attributes" : {
+          "class" : "ImageView",
+          "name" : "waveFormView",
+          "uuid" : "DBBD92AA-00DA-4BDA-8DEB-2D0429CEE02E",
+          "frame" : "{{462, 334}, {100, 100}}",
+          "border_width" : 1,
+          "corner_radius" : 10
+        },
+        "frame" : "{{6, 166}, {1012, 532}}",
+        "selected" : false,
+        "nodes" : [
+
+        ]
+      },
+      {
+        "class" : "TextView",
+        "attributes" : {
+          "border_width" : 3,
+          "background_color" : "RGBA(0.866667,1.000000,0.800000,1.000000)",
+          "alignment" : "left",
+          "autocorrection_type" : "default",
+          "font_size" : 17,
+          "font_name" : "<System>",
+          "frame" : "{{412, 284}, {200, 200}}",
+          "flex" : "WH",
+          "tint_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+          "corner_radius" : 10,
+          "name" : "recordingsView",
+          "uuid" : "B7D35678-D20E-40AA-9B0D-792905AF6B8C",
+          "editable" : true,
+          "spellchecking_type" : "default",
+          "class" : "TextView"
+        },
+        "frame" : "{{6, 166}, {1012, 596}}",
+        "selected" : true,
+        "nodes" : [
+
+        ]
+      },
+      {
+        "class" : "Button",
+        "attributes" : {
+          "background_color" : "RGBA(1.000000,1.000000,0.000000,1.000000)",
+          "frame" : "{{120, 144}, {80, 32}}",
+          "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+          "font_size" : 20,
+          "title" : "List your original recordings",
+          "action" : "listButton_tapped",
+          "font_bold" : true,
+          "name" : "listOriginalButton",
+          "corner_radius" : 10,
+          "uuid" : "47AA8295-BD60-4C7A-9C6D-81CD1089879A",
+          "border_width" : 3,
+          "class" : "Button"
+        },
+        "frame" : "{{710, 192}, {287, 58}}",
+        "selected" : false,
+        "nodes" : [
+
+        ]
+      },
+      {
+        "class" : "Button",
+        "attributes" : {
+          "background_color" : "RGBA(0.100000,1.000000,0.100000,1.000000)",
+          "frame" : "{{472, 368}, {80, 32}}",
+          "image_name" : "iob:flash_24",
+          "font_size" : 50,
+          "title" : "VX",
+          "custom_attributes" : "",
+          "flex" : "",
+          "action" : "xButton_tapped",
+          "font_bold" : true,
+          "name" : "xButton",
+          "corner_radius" : 75,
+          "border_width" : 3,
+          "uuid" : "F0905DD1-BE77-481A-A5E2-851FC7255453",
+          "class" : "Button"
+        },
+        "frame" : "{{415, 6}, {200, 150}}",
+        "selected" : false,
+        "nodes" : [
+
+        ]
+      },
+      {
+        "class" : "Button",
+        "attributes" : {
+          "background_color" : "RGBA(0.166667,1.000000,0.166667,1.000000)",
+          "frame" : "{{120, 144}, {80, 32}}",
+          "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+          "font_size" : 20,
+          "title" : "Record",
+          "image_name" : "iob:mic_a_24",
+          "action" : "recordButton_tapped",
+          "font_bold" : true,
+          "name" : "recordButton",
+          "corner_radius" : 10,
+          "uuid" : "47AA8295-BD60-4C7A-9C6D-81CD1089879A",
+          "border_width" : 3,
+          "class" : "Button"
+        },
+        "frame" : "{{63, 22}, {185, 58}}",
+        "selected" : false,
+        "nodes" : [
+
+        ]
+      },
+      {
+        "class" : "Button",
+        "attributes" : {
+          "background_color" : "RGBA(0.066667,1.000000,0.066667,1.000000)",
+          "frame" : "{{120, 144}, {80, 32}}",
+          "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+          "font_size" : 20,
+          "title" : "Play",
+          "image_name" : "iob:play_24",
+          "action" : "playButton_tapped",
+          "font_bold" : true,
+          "name" : "playButton",
+          "corner_radius" : 10,
+          "uuid" : "47AA8295-BD60-4C7A-9C6D-81CD1089879A",
+          "border_width" : 3,
+          "class" : "Button"
+        },
+        "frame" : "{{891, 35}, {119, 58}}",
+        "selected" : false,
+        "nodes" : [
+
+        ]
+      },
+      {
+        "class" : "TextField",
+        "attributes" : {
+          "alignment" : "center",
+          "autocorrection_type" : "default",
+          "font_size" : 17,
+          "font_name" : "<System>",
+          "placeholder" : "Enter file to X-form or play.",
+          "frame" : "{{412, 368}, {200, 32}}",
+          "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+          "flex" : "",
+          "action" : "",
+          "text" : "",
+          "text_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+          "name" : "recordingToPlay_or_Xform",
+          "spellchecking_type" : "default",
+          "uuid" : "95835FBC-AC80-4001-A696-83862B859E92",
+          "border_width" : 3,
+          "corner_radius" : 5,
+          "class" : "TextField"
+        },
+        "frame" : "{{641, 35}, {242, 58}}",
+        "selected" : false,
+        "nodes" : [
+
+        ]
+      },
+      {
+        "class" : "Button",
+        "attributes" : {
+          "background_color" : "RGBA(1.000000,1.000000,0.000000,1.000000)",
+          "frame" : "{{120, 144}, {80, 32}}",
+          "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+          "font_size" : 20,
+          "title" : "List X-formed recordings",
+          "action" : "listButton_tapped",
+          "font_bold" : true,
+          "name" : "listXformedButton",
+          "corner_radius" : 10,
+          "uuid" : "47AA8295-BD60-4C7A-9C6D-81CD1089879A",
+          "border_width" : 3,
+          "class" : "Button"
+        },
+        "frame" : "{{710, 340}, {287, 58}}",
+        "selected" : false,
+        "nodes" : [
+
+        ]
+      },
+      {
+        "class" : "Button",
+        "attributes" : {
+          "background_color" : "RGBA(1.000000,1.000000,0.000000,1.000000)",
+          "frame" : "{{120, 144}, {80, 32}}",
+          "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+          "font_size" : 20,
+          "title" : "List 'voices' to emulate",
+          "action" : "listButton_tapped",
+          "font_bold" : true,
+          "name" : "listVoicesButton",
+          "corner_radius" : 10,
+          "uuid" : "47AA8295-BD60-4C7A-9C6D-81CD1089879A",
+          "border_width" : 3,
+          "class" : "Button"
+        },
+        "frame" : "{{710, 266}, {287, 58}}",
+        "selected" : false,
+        "nodes" : [
+
+        ]
+      },
+      {
+        "class" : "Label",
+        "attributes" : {
+          "font_size" : 18,
+          "text" : "pan",
+          "font_name" : "<System>",
+          "name" : "pan_label",
+          "corner_radius" : 0,
+          "border_width" : 1,
+          "border_color" : "RGBA(1.000000,0.000000,0.000000,1.000000)",
+          "class" : "Label",
+          "alignment" : "center",
+          "frame" : "{{437, 368}, {150, 32}}",
+          "uuid" : "1A071FB2-94BD-4920-B96E-368C9312ABA3"
+        },
+        "frame" : "{{264, 122}, {52, 34}}",
+        "selected" : false,
+        "nodes" : [
+
+        ]
+      },
+      {
+        "class" : "Slider",
+        "attributes" : {
+          "flex" : "W",
+          "name" : "volume",
+          "corner_radius" : 0,
+          "value" : 0.5,
+          "border_color" : "RGBA(1.000000,0.000000,0.000000,1.000000)",
+          "class" : "Slider",
+          "border_width" : 1,
+          "frame" : "{{412, 367}, {200, 34}}",
+          "uuid" : "22398386-8AEA-449B-BBCA-24C7ED39E6E4"
+        },
+        "frame" : "{{641, 122}, {200, 34}}",
+        "selected" : false,
+        "nodes" : [
+
+        ]
+      },
+      {
+        "class" : "Label",
+        "attributes" : {
+          "font_size" : 18,
+          "text" : "volume",
+          "font_name" : "<System>",
+          "name" : "pan_label",
+          "corner_radius" : 0,
+          "border_width" : 1,
+          "border_color" : "RGBA(1.000000,0.000000,0.000000,1.000000)",
+          "class" : "Label",
+          "alignment" : "center",
+          "frame" : "{{437, 368}, {150, 32}}",
+          "uuid" : "1A071FB2-94BD-4920-B96E-368C9312ABA3"
+        },
+        "frame" : "{{842, 122}, {84, 34}}",
+        "selected" : false,
+        "nodes" : [
+
+        ]
+      },
+      {
+        "class" : "Slider",
+        "attributes" : {
+          "flex" : "W",
+          "name" : "pan",
+          "corner_radius" : 0,
+          "value" : 0.5,
+          "border_color" : "RGBA(1.000000,0.000000,0.000000,1.000000)",
+          "class" : "Slider",
+          "border_width" : 1,
+          "frame" : "{{412, 367}, {200, 34}}",
+          "uuid" : "22398386-8AEA-449B-BBCA-24C7ED39E6E4"
+        },
+        "frame" : "{{63, 122}, {200, 34}}",
+        "selected" : false,
+        "nodes" : [
+
+        ]
+      }
+    ]
+  }
+]

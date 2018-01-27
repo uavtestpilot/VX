@@ -31,7 +31,7 @@
       {
         "class" : "TextView",
         "attributes" : {
-          "border_width" : 3,
+          "spellchecking_type" : "default",
           "background_color" : "RGBA(0.866667,1.000000,0.800000,1.000000)",
           "alignment" : "left",
           "autocorrection_type" : "default",
@@ -42,13 +42,13 @@
           "tint_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
           "corner_radius" : 10,
           "name" : "recordingsView",
+          "border_width" : 3,
           "uuid" : "B7D35678-D20E-40AA-9B0D-792905AF6B8C",
-          "editable" : true,
-          "spellchecking_type" : "default",
+          "editable" : false,
           "class" : "TextView"
         },
         "frame" : "{{6, 166}, {1012, 596}}",
-        "selected" : true,
+        "selected" : false,
         "nodes" : [
 
         ]
@@ -62,6 +62,7 @@
           "font_size" : 20,
           "title" : "List your original recordings",
           "action" : "listButton_tapped",
+          "flex" : "",
           "font_bold" : true,
           "name" : "listOriginalButton",
           "corner_radius" : 10,
@@ -109,6 +110,7 @@
           "title" : "Record",
           "image_name" : "iob:mic_a_24",
           "action" : "recordButton_tapped",
+          "flex" : "",
           "font_bold" : true,
           "name" : "recordButton",
           "corner_radius" : 10,
@@ -116,7 +118,7 @@
           "border_width" : 3,
           "class" : "Button"
         },
-        "frame" : "{{63, 22}, {185, 58}}",
+        "frame" : "{{63, 35}, {185, 58}}",
         "selected" : false,
         "nodes" : [
 
@@ -156,7 +158,7 @@
           "frame" : "{{412, 368}, {200, 32}}",
           "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
           "flex" : "",
-          "action" : "",
+          "action" : "textField_dataEntered",
           "text" : "",
           "text_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
           "name" : "recordingToPlay_or_Xform",

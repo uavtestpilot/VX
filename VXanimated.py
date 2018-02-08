@@ -1,6 +1,4 @@
-'''
-
-   
+'''  
 This is the starting point of this program: Voice X-former (VX).
 
 This program transforms ones voice to be as one desires.
@@ -15,7 +13,7 @@ Created by Charles C. Geeting
 Created for Electric Universe, LLC
 Created between 12/13/2017 and ...  (Version ?)
 
- # ********************************************************************************* 
+# ********************************************************************************* 
 V. 0.0.1 Play a wave file. 01/01/2018
 V. 0.0.2 Record a sound and create a wave file. 01/09/2018
 V. 0.0.3 Create a GUI that allows you to: 
@@ -23,34 +21,39 @@ V. 0.0.3 Create a GUI that allows you to:
   2. play a recording. 01/14/2018
   3. Make a recording. 01/15/2018
   
-  To do...
-  4. View a waveform/recording in the time domain  
-         pick a "Voice" recording to emulate,
-         create a new transformed recording, etc...
-  NOTE: gui sliders to control pan and pitch probably should be added
 
-  
-    
-# **********************************************************************************       
-Redo!...decided to use the scene class to create a more visually pleasing gui
-so VXgui.py replaced with VXanimated.py, VXgui.pyui no longer needed.
-
-V. 0.0.1 Initial screen populated with the play and record buttons, and the 
-         file listing buttons. 02/01/2018
-  
+V. 0.0.4 Used the scene class to create a more visually pleasing gui.
+         VXgui.py replaced with VXanimated.py.
+         VXgui.pyui no longer needed.
+         Initial screen populated with the play and record buttons, and the file listing buttons. Above functionality will need to redone. 02/01/2018
+         
+  1. list the wave files available to be played. 02/07/2018 
+  2. play a recording. 02/07/2018
+         
+To do............................................................................
+View a waveform/recording in the time domain.
+pick a "Voice" recording to emulate,
+create a new transformed recording, etc...
+gui sliders to control pan and pitch probably should be added  
+listing of recordings could be better
+mned and "x" through the "clear screen" buttons.
 '''
 
 from scene import *
 import sound, random, math
 
 # Voice X-formation functions
-from VXfunctions import singerRecordings, XformedRecordings, getWaveFile, determineFileName, playClickSound, waveViewTD, displayTitle, displaySunburstSprite, displayButtons, moveSprite, displayAlternateButtons
+from VXfunctions import *
+"""
+ singerRecordings, XformedRecordings, getWaveFile, determineFileName, playClickSound, waveViewTD, displayTitle, displaySunburstSprite, displayButtons, moveSprite, displayAlternateButtons, g_altButton, was_originalRecordingsFileSelected
+"""
 
 A = Action
-
   
 class MyScene (Scene):
    
+  
+  
   def setup(self):
       
     self.background_color = "#1226ff" # set background to a cool blue
@@ -62,6 +65,8 @@ class MyScene (Scene):
     # display initial control buttons (record, play, list, display, Xform)
     displayButtons(self)
     
+    
+    
        
     
   
@@ -71,16 +76,27 @@ class MyScene (Scene):
   
   
   def update(self):
-    pass
-  
-  
-  
-  def touch_began(self, touch):
+    #global song
+    if state["stopPlayButton"] == "displayed":
+      if state["song"].playing == False:
+        playButton(self)
     
-    moveSprite(self, touch)
+  
+  
+  
+  def touch_began(self, touch):   
+    moveSprite(self, touch)# for my amusement
   
     displayAlternateButtons(self, touch) # IF button touched play click sound
     # and display the alternate button symbol, e.g. play -> STOP play and visa versa
+    
+    if state["originalRecordings"] == "displayed":
+      was_originalRecordingsFileSelected(self, touch) # highlight recording if so.
+    elif state["singerRecordings"] == "displayed":
+      was_singerRecordingsFileSelected(self, touch) # highlight recording if so.
+    elif state["XformedRecordings"] == "displayed":
+      was_XformedRecordingsFileSelected(self, touch) # highlight recording if so.
+    
    
     
     

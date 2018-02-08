@@ -8,8 +8,44 @@ from PIL import Image
 import ImageDraw
 import ui
 
-# To keep track of the state of the buttons
-g_altButton = {"playButton" : 0, "recordButton" : 0, "originalsButton" : 0, "originalRecordings" : 0, "singersButton" : 0, "XformedButton" : 0}
+        
+# To keep track of the state of the buttons, messages, files displayed...etc.
+state = {"recordButton" : "notDisplayed", "stopRecordButton" : "notDisplayed", \
+         "playButton" : "notDisplayed", "stopPlayButton" : "notDisplayed", \
+         
+         "originalsButton" : "notDisplayed", \
+         "clearScreenOriginalsButton" : "notDisplayed", \
+         "originalRecordings" : "notDisplayed", \
+         "originalRecording" : "notSelected", \
+         "originalRecSelectedIndex" : None, \
+         "originalRecordings_Msg" : "notDisplayed", \
+                  
+         "singersButton" : "notDisplayed", \
+         "clearScreenSingersButton" : "notDisplayed", \
+         "singerRecordings" : "notDisplayed", \
+         "singerRecording" : "notSelected", \
+         "singerRecSelectedIndex" : None, \
+         "singerRecordings_Msg" : "notDisplayed", \
+                  
+         "XformedButton" : "notDisplayed", \
+         "clearScreenXformedButton" : "notDisplayed", \
+         "XformedRecordings" : "notDisplayed", \
+         "XformedRecording" : "notSelected", \
+         "XformedRecSelectedIndex" : None, \
+         "XformedRecordings_Msg" : "notDisplayed", \
+         
+         "noRecordingSelected_Msg" : "notDisplayed", \
+         
+         "song" : None}
+         
+"""
+"*Button" : ["notDisplayed"/"displayed"]
+"*Recording" : ["selected"/"notSelected"] ...an individual recording
+"*Recordings" : ["displayed"/"notDisplayed"] ...the recordings as a group
+"*Index" : [None/integerNumber] ...the index of a selected recording in the    
+                                   recordings list
+song : [None/sound.Player() object]
+"""
 
 
 
@@ -22,105 +58,153 @@ path2_originalVoices = './waveFiles/originalVoices/'
 
  
 def recordButton(self): 
-  remove_stopRecordButton(self)
-  display_recordButton(self)
+  # The "record" button actually consists of the record and stopRecord buttons
+  if state["recordButton"] == "notDisplayed":
+    display_recordButton(self)
+    if state["stopRecordButton"] == "displayed":
+      remove_stopRecordButton(self)
+  elif state["recordButton"] == "displayed":
+    display_stopRecordButton(self)
+    remove_recordButton(self)
   
   
-def stopRecordButton(self): 
-  remove_recordButton(self)
-  display_stopRecordButton(self)
- 
- 
+  
+def playButton(self):
+  global song
+  # The "play" button actually consists of the play and stopPlay buttons
+  if state["playButton"] == "notDisplayed":
+    display_playButton(self)
+    if state["stopPlayButton"] == "displayed":
+      remove_stopPlayButton(self)
+      state["song"].stop() 
+      state["song"] = None  
+  elif state["playButton"] == "displayed" and \
+       (state["originalRecording"] == "selected" or \
+       state["singerRecording"] == "selected" or \
+       state["XformedRecording"] == "selected") :
+    playRecording(self)  
+  elif state["playButton"] == "displayed" :
+    display_noRecordingSelected_Msg(self)
+  
+
+      
+def playRecording(self):
+  display_stopPlayButton(self)
+  remove_playButton(self)
+  if state["originalRecording"] == "selected" :
+    path = path2_originalVoices
+    file = path + self.originalRecordings[state["originalRecSelectedIndex"]].text
+  elif state["singerRecording"] == "selected" :
+    path = path2_voices2emulate
+    file = path + self.singerRecordings[state["singerRecSelectedIndex"]].text
+  else :
+    path = path2_transformedVoices
+    file = path + self.XformedRecordings[state["XformedRecSelectedIndex"]].text  
+  
+  state["song"] = sound.Player(file)
+  state["song"].play()
+
+    
+          
 def originalsButton(self):
-  remove_clearScreenOriginalsButton(self)
-  remove_originalRecordings(self)
-  display_originalsButton(self)
- 
-       
-def clearScreenOriginalsButton(self):  
-  remove_originalsButton(self)
-  display_originalRecordings(self)
-  display_clearScreenOriginalsButton(self)
+  # The "originals" button actually consists of the originals and clearScreenOriginals buttons
+  if state["originalsButton"] == "notDisplayed":
+    display_originalsButton(self)
+    if state["clearScreenOriginalsButton"] == "displayed":
+      remove_clearScreenOriginalsButton(self)
+      if state["originalRecordings"] == "displayed" :
+        remove_originalRecordings(self)
+  elif state["originalsButton"] == "displayed":
+    remove_originalsButton(self)
+    display_clearScreenOriginalsButton(self)
+    display_originalRecordings(self)
+    
+    if state["clearScreenSingersButton"] == "displayed":
+      remove_clearScreenSingersButton(self)
+      display_singersButton(self)
+      if state["singerRecordings"] == "displayed" :
+        remove_singerRecordings(self)      
+    elif state["clearScreenXformedButton"] == "displayed":
+      remove_clearScreenXformedButton(self)
+      display_XformedButton(self)
+      if state["XformedRecordings"] == "displayed" :
+        remove_XformedRecordings(self)
+
 
 
 def singersButton(self):
-  remove_clearScreenSingersButton(self)
-  display_singersButton(self)
-  
-
-def clearScreenSingersButton(self):  
-  remove_singersButton(self)
-  #display_singers2Emulate(self)
-  display_clearScreenSingersButton(self)
-  
+  # The "singers" button actually consists of the singers and clearScreenSingers buttons
+  if state["singersButton"] == "notDisplayed":
+    display_singersButton(self)
+    if state["clearScreenSingersButton"] == "displayed":
+      remove_clearScreenSingersButton(self)
+      if state["singerRecordings"] == "displayed" :
+        remove_singerRecordings(self)
+  elif state["singersButton"] == "displayed":
+    remove_singersButton(self)
+    display_clearScreenSingersButton(self)
+    display_singerRecordings(self)
     
+    if state["clearScreenOriginalsButton"] == "displayed":
+      remove_clearScreenOriginalsButton(self)
+      display_originalsButton(self)
+      if state["originalRecordings"] == "displayed" :
+        remove_originalRecordings(self)      
+    elif state["clearScreenXformedButton"] == "displayed":
+      remove_clearScreenXformedButton(self)
+      display_XformedButton(self)
+      if state["XformedRecordings"] == "displayed" :
+        remove_XformedRecordings(self)
+
+
+        
 def XformedButton(self):
-  remove_clearScreenXformedButton(self)
-  display_XformedButton(self)
-
+  # The "Xformed" button actually consists of the Xformed and clearScreenXformed buttons
+  if state["XformedButton"] == "notDisplayed":
+    display_XformedButton(self)
+    if state["clearScreenXformedButton"] == "displayed":
+      remove_clearScreenXformedButton(self)
+      if state["XformedRecordings"] == "displayed" :
+        remove_XformedRecordings(self)
+  elif state["XformedButton"] == "displayed":
+    remove_XformedButton(self)
+    display_clearScreenXformedButton(self)
+    display_XformedRecordings(self)    
     
-def clearScreenXformedButton(self):  
-  remove_XformedButton(self)
-  #display_XformedRecordings(self)
-  display_clearScreenXformedButton(self)
-  
-      
-def playButton(self):
-  remove_stopPlayButton(self)
-  display_playButton(self)
-  
-  
-def stopPlayButton(self):
-  remove_playButton(self)
-  display_stopPlayButton(self)
+    if state["clearScreenSingersButton"] == "displayed":
+      remove_clearScreenSingersButton(self)
+      display_singersButton(self)
+      if state["singerRecordings"] == "displayed" :
+        remove_singerRecordings(self)      
+    elif state["clearScreenOriginalsButton"] == "displayed":
+      remove_clearScreenOriginalsButton(self)
+      display_originalsButton(self)
+      if state["originalRecordings"] == "displayed" :
+        remove_originalRecordings(self)
 
 
      
 def displayAlternateButtons(self, touch):
   """
-  play the click sound if a button has been touched, and then display the 
-  buttons alternate
+  play the click sound if a button has been touched, and then display the appropriate button
   """
   if touch.location in self.playButtonOuter.bbox:
-    playClickSound() 
-    
-    if g_altButton["playButton"] == 0 or g_altButton["playButton"] == 2:
-      stopPlayButton(self)
-    else:
-      playButton(self)
-      
+    sound.play_effect('drums:Drums_01')
+    playButton(self)     
   elif touch.location in self.recordButtonOuter.bbox:
-    playClickSound() 
-    
-    if g_altButton["recordButton"] == 0 or  g_altButton["recordButton"] == 2:
-      stopRecordButton(self)
-    else:
-      recordButton(self)
-      
+    sound.play_effect('drums:Drums_01')
+    recordButton(self)      
   elif touch.location in self.originalsButtonOuter.bbox:
-    playClickSound() 
+    sound.play_effect('drums:Drums_01')
+    originalsButton(self)     
+  elif touch.location in self.singersButtonOuter.bbox: 
+    sound.play_effect('drums:Drums_01')
+    singersButton(self)     
+  elif touch.location in self.XformedButtonOuter.bbox: 
+    sound.play_effect('drums:Drums_01')
+    XformedButton(self)
+  
     
-    if g_altButton["originalsButton"] == 0 or  g_altButton["originalsButton"] == 2:
-      clearScreenOriginalsButton(self)
-    else:
-      originalsButton(self)
-      
-  elif touch.location in self.singersButtonOuter.bbox:
-    playClickSound() 
-    
-    if g_altButton["singersButton"] == 0 or  g_altButton["singersButton"] == 2:
-      clearScreenSingersButton(self)
-    else:
-      singersButton(self)
-      
-  elif touch.location in self.XformedButtonOuter.bbox:
-    playClickSound() 
-    
-    if g_altButton["XformedButton"] == 0 or  g_altButton["XformedButton"] == 2:
-      clearScreenXformedButton(self)
-    else:
-      XformedButton(self)
- 
   
   
 def displayButtons(self):
@@ -135,8 +219,7 @@ def displayButtons(self):
   XformedButton(self)
   originalsButton(self)
   
-  
-  
+ 
   
   
 def getWaveFileData(waveFile):
@@ -384,40 +467,25 @@ def moveSprite(self, touch):
   move_action = Action.move_to(x, y, slideTime, TIMING_SINODIAL)
   self.spriteNode.run_action(move_action)
   
-
-# **********************************************************************************                     
-def playClickSound():
-  """
-  makes the click sound for the buttons when they are touched
-  """
-  sound.play_effect('game:Click_2')
-  time.sleep(0.05)
-  sound.stop_all_effects()
  
   
 # Singers 2 Emulate Button Logic *************************************************
 def remove_clearScreenSingersButton(self):
-   # can't remove clear screen button on initialization if it does not exist yet.
-  if g_altButton["singersButton"] == 1:
-    self.clrSingersButtonOuter.remove_from_parent()
-    self.clrSingersButton.remove_from_parent()
-    self.clrSingersButtonTitle.remove_from_parent()
-    
-  # to signify alternate button to be called next time
-  g_altButton["singersButton"] = 2  
-
+  state["clearScreenSingersButton"] = "notDisplayed"
+  self.clrSingersButtonOuter.remove_from_parent()
+  self.clrSingersButton.remove_from_parent()
+  self.clrSingersButtonTitle.remove_from_parent()
 
     
 def remove_singersButton(self):
+  state["singersButton"] = "notDisplayed"
   self.singersButtonOuter.remove_from_parent()
   self.singersButton.remove_from_parent()
   self.singersButtonTitle.remove_from_parent()
-    
-  # to signify alternate button to be called next time
-  g_altButton["singersButton"] = 1
-      
+     
   
 def display_singersButton(self): 
+  state["singersButton"] = "displayed"
   self.singersButtonOuter = SpriteNode('pzl:Blue8')
   self.singersButtonOuter.position = (self.size[0]/2, self.size[1] - 100)
   self.singersButtonOuter.x_scale = 2
@@ -431,11 +499,10 @@ def display_singersButton(self):
   self.singersButtonTitle.text = "Singers to Emulate"
   self.singersButtonTitle.position = (self.size[0]/2, self.size[1] - 130)
   self.add_child(self.singersButtonTitle)
-  
-
-  
+    
   
 def display_clearScreenSingersButton(self):
+  state["clearScreenSingersButton"] = "displayed"
   self.clrSingersButtonOuter = SpriteNode('pzl:PaddleRed')
   self.clrSingersButtonOuter.position = (self.size[0]/2, self.size[1] - 100)
   self.clrSingersButtonOuter.x_scale = 1.5
@@ -449,88 +516,25 @@ def display_clearScreenSingersButton(self):
   self.clrSingersButtonTitle.text = "Clear Screen"
   self.clrSingersButtonTitle.position = (self.size[0]/2, self.size[1] - 130)
   self.add_child(self.clrSingersButtonTitle)
-  
-  
-  
-# Original Recordings Button Logic ************************************************* 
-def remove_originalsButton(self):
-  self.originalsButtonOuter.remove_from_parent()
-  self.originalsButton.remove_from_parent()
-  self.originalsButtonTitle.remove_from_parent()
     
-  # to signify alternate button to be called next time
-  g_altButton["originalsButton"] = 1
-
-        
-def remove_clearScreenOriginalsButton(self): 
-  # can't remove clear screen button on initialization if it does not exist yet.
-  if g_altButton["originalsButton"] == 1:
-    self.clrOriginalsButtonOuter.remove_from_parent()
-    self.clrOriginalsButton.remove_from_parent()
-    self.clrOriginalsButtonTitle.remove_from_parent()
-    
-  # to signify alternate button to be called next time
-  g_altButton["originalsButton"] = 2  
-    
-  
-  
-def display_originalsButton(self):
-  self.originalsButtonOuter = SpriteNode('pzl:Blue8')
-  self.originalsButtonOuter.position = (275, self.size[1] - 100)
-  self.originalsButtonOuter.x_scale = 2
-  self.add_child(self.originalsButtonOuter)
-  
-  self.originalsButton = SpriteNode('iob:ios7_folder_outline_32')
-  self.originalsButton.position = (275, self.size[1] - 100)
-  self.add_child(self.originalsButton)
-  
-  self.originalsButtonTitle = LabelNode('Hoefler Text')
-  self.originalsButtonTitle.text = "Original recordings"
-  self.originalsButtonTitle.position = (275, self.size[1] - 130)
-  self.add_child(self.originalsButtonTitle) 
-  
-          
-    
-def display_clearScreenOriginalsButton(self):
-  self.clrOriginalsButtonOuter = SpriteNode('pzl:PaddleRed')
-  self.clrOriginalsButtonOuter.position = (275, self.size[1] - 100)
-  self.clrOriginalsButtonOuter.x_scale = 1.5
-  self.add_child(self.clrOriginalsButtonOuter)
-  
-  self.clrOriginalsButton = SpriteNode('iob:ios7_folder_outline_32')
-  self.clrOriginalsButton.position = (275, self.size[1] - 100)
-  self.add_child(self.clrOriginalsButton)
-   
-  self.clrOriginalsButtonTitle = LabelNode('Hoefler Text')
-  self.clrOriginalsButtonTitle.text = "Clear Screen"
-  self.clrOriginalsButtonTitle.position = (275, self.size[1] - 130)
-  self.add_child(self.clrOriginalsButtonTitle) 
-
 
 # Record Button Logic **************************************************************
 def remove_recordButton(self):
+  state["recordButton"] = "notDisplayed"
   self.recordButtonOuter.remove_from_parent()
   self.recordButton.remove_from_parent()
   self.recordButtonTitle.remove_from_parent()
   
-  # to signify record button to be called next time
-  g_altButton["recordButton"] = 1
-  
-  
   
 def remove_stopRecordButton(self):
-  # can't remove stop record button on initialization if it does not exist yet.
-  if g_altButton["recordButton"] == 1:
-    self.stopRecordButtonOuter.remove_from_parent()
-    self.stopRecordButton.remove_from_parent()
-    self.stopRecordButtonTitle.remove_from_parent()
-    
-  # to signify alternate button to be called next time
-  g_altButton["recordButton"] = 2    
-         
-         
+  state["stopRecordButton"] = "notDisplayed"
+  self.stopRecordButtonOuter.remove_from_parent()
+  self.stopRecordButton.remove_from_parent()
+  self.stopRecordButtonTitle.remove_from_parent()
+            
          
 def display_stopRecordButton(self):
+  state["stopRecordButton"] = "displayed"
   self.stopRecordButtonOuter = SpriteNode('pzl:Red8')
   self.stopRecordButtonOuter.position = (100, self.size[1] - 100)
   self.add_child(self.stopRecordButtonOuter)
@@ -547,6 +551,7 @@ def display_stopRecordButton(self):
   
 
 def display_recordButton(self):
+  state["recordButton"] = "displayed"
   self.recordButtonOuter = SpriteNode('pzl:Purple8')
   self.recordButtonOuter.position = (100, self.size[1] - 100)
   self.add_child(self.recordButtonOuter)
@@ -563,28 +568,21 @@ def display_recordButton(self):
 
 # Xformed Button Logic *************************************************************  
 def remove_XformedButton(self):
+  state["XformedButton"] = "notDisplayed"
   self.XformedButtonOuter.remove_from_parent()
   self.XformedButton.remove_from_parent()
   self.XformedButtonTitle.remove_from_parent()
-    
-  # to signify alternate button to be called next time
-  g_altButton["XformedButton"] = 1
- 
-       
+        
   
 def remove_clearScreenXformedButton(self):
-  # can't remove clear screen button on initialization if it does not exist yet.
-  if g_altButton["XformedButton"] == 1:
-    self.clrXformedButtonOuter.remove_from_parent()
-    self.clrXformedButton.remove_from_parent()
-    self.clrXformedButtonTitle.remove_from_parent()
-    
-  # to signify alternate button to be called next time
-  g_altButton["XformedButton"] = 2  
-  
- 
+  state["clearScreenXformedButton"] = "notDisplayed"
+  self.clrXformedButtonOuter.remove_from_parent()
+  self.clrXformedButton.remove_from_parent()
+  self.clrXformedButtonTitle.remove_from_parent()
+     
        
 def display_clearScreenXformedButton(self):
+  state["clearScreenXformedButton"] = "displayed"
   self.clrXformedButtonOuter = SpriteNode('pzl:PaddleRed')
   self.clrXformedButtonOuter.position = (self.size[0] - 275, self.size[1] - 100)
   self.clrXformedButtonOuter.x_scale = 1.5
@@ -598,10 +596,10 @@ def display_clearScreenXformedButton(self):
   self.clrXformedButtonTitle.text = "Clear Screen"
   self.clrXformedButtonTitle.position = (self.size[0] - 275, self.size[1] - 130)
   self.add_child(self.clrXformedButtonTitle)
-
-  
+ 
     
 def display_XformedButton(self):
+  state["XformedButton"] = "displayed"
   self.XformedButtonOuter = SpriteNode('pzl:Blue8')
   self.XformedButtonOuter.position = (self.size[0] - 275, self.size[1] - 100)
   self.XformedButtonOuter.x_scale = 2
@@ -615,32 +613,25 @@ def display_XformedButton(self):
   self.XformedButtonTitle.text = "X-formed Recordings"
   self.XformedButtonTitle.position = (self.size[0] - 275, self.size[1] - 130)
   self.add_child(self.XformedButtonTitle) 
- 
-  
+   
     
 # Play Button Logic ****************************************************************
 def remove_stopPlayButton(self):
-  # can't remove stop play button on initialization if it does not exist yet.
-  if g_altButton["playButton"] == 1:
-    self.stopPlayButtonOuter.remove_from_parent()
-    self.stopPlayButton.remove_from_parent()
-    self.stopPlayButtonTitle.remove_from_parent()
-    
-  # to signify stop play button to be called next time
-  g_altButton["playButton"] = 2  
-  
+  state["stopPlayButton"] = "notDisplayed"
+  self.stopPlayButtonOuter.remove_from_parent()
+  self.stopPlayButton.remove_from_parent()
+  self.stopPlayButtonTitle.remove_from_parent()
+     
   
 def remove_playButton(self):
+  state["playButton"] = "notDisplayed"
   self.playButtonOuter.remove_from_parent()
   self.playButton.remove_from_parent()
   self.playButtonTitle.remove_from_parent()
-  
-  # to signify play button to be called next time
-  g_altButton["playButton"] = 1
-  
-  
-  
+
+   
 def display_playButton(self):
+  state["playButton"] = "displayed"
   self.playButtonOuter = SpriteNode('pzl:Purple8')
   self.playButtonOuter.position = (self.size[0] - 100, self.size[1] - 100)
   self.add_child(self.playButtonOuter)
@@ -654,9 +645,9 @@ def display_playButton(self):
   self.playButtonTitle.position = (self.size[0] - 100, self.size[1] - 130)
   self.add_child(self.playButtonTitle) 
 
- 
   
 def display_stopPlayButton(self):
+  state["stopPlayButton"] = "displayed"
   self.stopPlayButtonOuter = SpriteNode('pzl:Red8')
   self.stopPlayButtonOuter.position = (self.size[0] - 100, self.size[1] - 100)
   self.add_child(self.stopPlayButtonOuter)
@@ -671,30 +662,124 @@ def display_stopPlayButton(self):
   self.add_child(self.stopPlayButtonTitle)
 
 
-# Original Recordings Listing Logic ************************************************
+# Original Recordings Button Logic ************************************************* 
+def remove_originalsButton(self):
+  state["originalsButton"] = "notDisplayed"
+  self.originalsButtonOuter.remove_from_parent()
+  self.originalsButton.remove_from_parent()
+  self.originalsButtonTitle.remove_from_parent()
+    
+        
+def remove_clearScreenOriginalsButton(self): 
+  state["clearScreenOriginalsButton"] = "notDisplayed"
+  self.clrOriginalsButtonOuter.remove_from_parent()
+  self.clrOriginalsButton.remove_from_parent()
+  self.clrOriginalsButtonTitle.remove_from_parent()
+          
   
+def display_originalsButton(self):
+  state["originalsButton"] = "displayed"
+  self.originalsButtonOuter = SpriteNode('pzl:Blue8')
+  self.originalsButtonOuter.position = (275, self.size[1] - 100)
+  self.originalsButtonOuter.x_scale = 2
+  self.add_child(self.originalsButtonOuter)
   
+  self.originalsButton = SpriteNode('iob:ios7_folder_outline_32')
+  self.originalsButton.position = (275, self.size[1] - 100)
+  self.add_child(self.originalsButton)
+  
+  self.originalsButtonTitle = LabelNode('Hoefler Text')
+  self.originalsButtonTitle.text = "Original recordings"
+  self.originalsButtonTitle.position = (275, self.size[1] - 130)
+  self.add_child(self.originalsButtonTitle) 
+           
+    
+def display_clearScreenOriginalsButton(self):
+  state["clearScreenOriginalsButton"] = "displayed"
+  self.clrOriginalsButtonOuter = SpriteNode('pzl:PaddleRed')
+  self.clrOriginalsButtonOuter.position = (275, self.size[1] - 100)
+  self.clrOriginalsButtonOuter.x_scale = 1.5
+  self.add_child(self.clrOriginalsButtonOuter)
+  
+  self.clrOriginalsButton = SpriteNode('iob:ios7_folder_outline_32')
+  self.clrOriginalsButton.position = (275, self.size[1] - 100)
+  self.add_child(self.clrOriginalsButton)
+   
+  self.clrOriginalsButtonTitle = LabelNode('Hoefler Text')
+  self.clrOriginalsButtonTitle.text = "Clear Screen"
+  self.clrOriginalsButtonTitle.position = (275, self.size[1] - 130)
+  self.add_child(self.clrOriginalsButtonTitle) 
+
+
+
+# Listing Logic common to all ******************************************************
+def display_noRecordingSelected_Msg(self):
+  global state
+  sound.play_effect('game:Ding_3')
+   
+  if state["originalRecordings_Msg"] == "displayed" :
+    self.originalRecordings_Msg.remove_from_parent()
+    state["originalRecordings_Msg"] = "notDisplayed"    
+  elif state["singerRecordings_Msg"] == "displayed" :
+    self.singerRecordings_Msg.remove_from_parent()
+    state["singerRecordings_Msg"] = "notDisplayed"
+  elif state["XformedRecordings_Msg"] == "displayed" :
+    self.XformedRecordings_Msg.remove_from_parent()
+    state["XformedRecordings_Msg"] = "notDisplayed"
+  
+  if state["noRecordingSelected_Msg"] != "displayed" :
+    # display error message 
+    state["noRecordingSelected_Msg"] = "displayed"
+    self.noRecordingSelected_Msg = LabelNode()
+    self.noRecordingSelected_Msg.color = "#000000"
+    self.noRecordingSelected_Msg.font = ('Symbol', 40)
+    self.noRecordingSelected_Msg.text = "-- No Recording Selected To Be Played --"
+    self.noRecordingSelected_Msg.position = (self.size[0]/2, 575)
+    self.add_child(self.noRecordingSelected_Msg) 
+ 
+       
+# Original Recordings Listing Logic ************************************************ 
 def remove_originalRecordings(self):
-  # can't remove anything on initialization since it does not exist yet.
-  if g_altButton["originalRecordings"] == 1:
-    self.originalRecordingsTitle.remove_from_parent()
+  global state
+  if state["originalRecordings_Msg"] == "displayed" :
+    self.originalRecordings_Msg.remove_from_parent()
+    state["originalRecordings_Msg"] = "notDisplayed"   
+  else:
+    self.noRecordingSelected_Msg.remove_from_parent()
+    state["noRecordingSelected_Msg"] = "notDisplayed"
+    
+  if state["originalRecordings"] == "displayed":   
+    
+    state["originalRecordings"] = "notDisplayed"
+    state["originalRecording"] = "notSelected"
+    state["originalRecSelectedIndex"] = None
     for index in range(len(self.originalRecordingsOuter)):
       self.originalRecordingsOuter[index].remove_from_parent()
       self.originalRecordings[index].remove_from_parent()
-      
-      
-def display_originalRecordingsTitle(self):  
-  # display listing title 
-  self.originalRecordingsTitle = LabelNode()
-  self.originalRecordingsTitle.color = "#ff0909"
-  self.originalRecordingsTitle.font = ('Papyrus', 40)
-  self.originalRecordingsTitle.text = "Original Recordings:"
-  self.originalRecordingsTitle.position = (self.size[0]/2, 575)
-  self.add_child(self.originalRecordingsTitle)  
+                        
+ 
+                    
+def display_originalRecordings_Msg(self):  
+  global state
+  
+  if state["noRecordingSelected_Msg"] == "displayed" :
+    self.noRecordingSelected_Msg.remove_from_parent()
+    state["noRecordingSelected_Msg"] = "notDisplayed"   
+    
+  if state["originalRecordings_Msg"] != "displayed":
+    # display recordings listing message
+    state["originalRecordings_Msg"] = "displayed"
+    self.originalRecordings_Msg = LabelNode()
+    self.originalRecordings_Msg.color = "#ff0909"
+    self.originalRecordings_Msg.font = ('Papyrus', 40)
+    self.originalRecordings_Msg.text = "Original Recordings:"
+    self.originalRecordings_Msg.position = (self.size[0]/2, 575)
+    self.add_child(self.originalRecordings_Msg)  
+    
 
  
-def display_noOriginalRecordingsCreatedYet(self):
-   # display the "error" message
+def display_noOriginalRecordingsCreatedYet_Msg(self):
+  # display the "error" message
   self.noOriginalRecordings = LabelNode()
   self.noOriginalRecordings.color = "#ff0909"
   self.noOriginalRecordings.font = ('Times New Roman', 60)
@@ -724,25 +809,56 @@ def displayOriginalsRecordings(self, recordings, index, x, x_offset, y, y_offset
   self.add_child(self.originalRecordingsOuter[index]) 
   #self.originalRecordingsOuter[index].add_child(self.originalRecordings[index])
   self.add_child(self.originalRecordings[index]) #text on top of "button"
-  
-  return self.originalRecordingsOuter
+ 
     
+          
+def was_originalRecordingsFileSelected(self, touch):
+  orgRecOut = self.originalRecordingsOuter
+  
+  for index in range(len(orgRecOut)): 
+    # if file selected highlight it.
+    if touch.location in orgRecOut[index].bbox:
+      sound.play_effect('8ve:8ve-tap-double')
+      if index == state["originalRecSelectedIndex"]:
+        return # same file has already been selected
+      state["originalRecPrevColor"] = orgRecOut[index].color
+      orgRecOut[index].color = "yellow"
+      state["originalRecNewColor"] = orgRecOut[index].color
+      orgRecOut[index].scale = 1.1
+      (X, Y) = orgRecOut[index].position 
+      orgRecOut[index].position = (X - 10, Y)
+  
+      # so I know which recording to play if the play button is selected.
+      state["originalRecSelectedIndex"] = index 
+      state["originalRecording"] = "selected"
+      
+      if state["noRecordingSelected_Msg"] == "displayed":
+        display_originalRecordings_Msg(self)      
+      
+      # if a file is selected make sure any previous selected file is unselected
+      for index in range(len(orgRecOut)):
+        if orgRecOut[index].color == state["originalRecNewColor"] and \
+           index != state["originalRecSelectedIndex"]:
+          orgRecOut[index].color = state["originalRecPrevColor"]
+          orgRecOut[index].scale = 1
+          (X, Y) = orgRecOut[index].position 
+          orgRecOut[index].position = (X + 10, Y)
+          break      
+          
+      break
  
- 
+         
        
-def display_originalRecordings(self):
-  # so the remove_originalRecordings function knows it has something to remove
-  g_altButton["originalRecordings"] = 1 
-  
-  display_originalRecordingsTitle(self)  
-  
+def display_originalRecordings(self): 
+  global state
   # return the wave files of the original recordings that have been made so far.
   recordings = os.listdir(path2_originalVoices)
   if len(recordings) == 0 :
-    display_noOriginalRecordingsCreatedYet(self)  
+    display_noOriginalRecordingsCreatedYet_Msg(self)  
     return 
-    
   
+  display_originalRecordings_Msg(self)      
+  state["originalRecordings"] = "displayed"
   self.originalRecordings = list()
   self.originalRecordingsOuter = list()
   x = 25
@@ -760,13 +876,290 @@ def display_originalRecordings(self):
     displayOriginalsRecordings(self, recordings, index, x, x_offset, y, y_offset)
       
     x += (len(recordings[index]) * xFactor)
+
+        
     
+# Xformed Recordings Listing Logic ************************************************ 
+def remove_XformedRecordings(self):
+  global state
+  if state["XformedRecordings_Msg"] == "displayed" :
+    self.XformedRecordings_Msg.remove_from_parent()
+    state["XformedRecordings_Msg"] = "notDisplayed"   
+  else:
+    self.noRecordingSelected_Msg.remove_from_parent()
+    state["noRecordingSelected_Msg"] = "notDisplayed"
     
+  if state["XformedRecordings"] == "displayed":
+    
+    state["XformedRecordings"] = "notDisplayed"
+    state["XformedRecording"] = "notSelected"
+    state["XformedRecSelectedIndex"] = None
+    for index in range(len(self.XformedRecordingsOuter)):
+      self.XformedRecordingsOuter[index].remove_from_parent()
+      self.XformedRecordings[index].remove_from_parent()
+                        
+ 
+                    
+def display_XformedRecordings_Msg(self):  
+  global state
   
-   
+  if state["noRecordingSelected_Msg"] == "displayed" :
+    self.noRecordingSelected_Msg.remove_from_parent()
+    state["noRecordingSelected_Msg"] = "notDisplayed"   
     
-  
+  if state["XformedRecordings_Msg"] != "displayed":
+    # display recordings listing message
+    state["XformedRecordings_Msg"] = "displayed"
+    self.XformedRecordings_Msg = LabelNode()
+    self.XformedRecordings_Msg.color = "#ff0909"
+    self.XformedRecordings_Msg.font = ('Papyrus', 40)
+    self.XformedRecordings_Msg.text = "X-formed Recordings:"
+    self.XformedRecordings_Msg.position = (self.size[0]/2, 575)
+    self.add_child(self.XformedRecordings_Msg)  
+    
+
+ 
+def display_noXformedRecordingsCreatedYet_Msg(self):
+  # display the "error" message
+  self.noXformedRecordings = LabelNode()
+  self.noXformedRecordings.color = "#ff0909"
+  self.noXformedRecordings.font = ('Times New Roman', 60)
+  self.noXformedRecordings.text = "No Xformed Recordings have been created yet."
+  self.noXformedRecordings.position = (self.size[0]/2, self.size[1]/2)
+  self.add_child(self.noXformedRecordings)  
 
   
+    
+def displayXformedsRecordings(self, recordings, index, x, x_offset, y, y_offset):
+  # name of file to be displayed
+  self.XformedRecordings.append(LabelNode())
+  self.XformedRecordings[index].font = ('American Typewriter', 15)
+  self.XformedRecordings[index].text = recordings[index]
+  self.XformedRecordings[index].color = "black"
+  self.XformedRecordings[index].anchor_point = (0, 0.5) # lower left
+  #self.XformedRecordings[index].anchor_point = (0.5, 0.5) # lower left
+  self.XformedRecordings[index].position = (x + 7, y - y_offset)
+   
+  # the "container" around the filename for easy highlighting by the user
+  self.XformedRecordingsOuter.append(SpriteNode('pzl:Button1'))
+  self.XformedRecordingsOuter[index].anchor_point = (0, 0.5) # lower left
+  (X, Y) = self.XformedRecordings[index].size
+  self.XformedRecordingsOuter[index].size = (X + 15, Y)    
+  self.XformedRecordingsOuter[index].position = (x, y - y_offset)    
   
+  self.add_child(self.XformedRecordingsOuter[index]) 
+  #self.XformedRecordingsOuter[index].add_child(self.XformedRecordings[index])
+  self.add_child(self.XformedRecordings[index]) #text on top of "button"
+ 
+    
+          
+def was_XformedRecordingsFileSelected(self, touch):
+  orgRecOut = self.XformedRecordingsOuter
+  
+  for index in range(len(orgRecOut)): 
+    # if file selected highlight it.
+    if touch.location in orgRecOut[index].bbox:
+      sound.play_effect('8ve:8ve-tap-double')
+      if index == state["XformedRecSelectedIndex"]:
+        return # same file has already been selected
+      state["XformedRecPrevColor"] = orgRecOut[index].color
+      orgRecOut[index].color = "yellow"
+      state["XformedRecNewColor"] = orgRecOut[index].color
+      orgRecOut[index].scale = 1.1
+      (X, Y) = orgRecOut[index].position 
+      orgRecOut[index].position = (X - 10, Y)
+  
+      # so I know which recording to play if the play button is selected.
+      state["XformedRecSelectedIndex"] = index 
+      state["XformedRecording"] = "selected"
+      
+      if state["noRecordingSelected_Msg"] == "displayed":
+        display_XformedRecordings_Msg(self)      
+      
+      # if a file is selected make sure any previous selected file is unselected
+      for index in range(len(orgRecOut)):
+        if orgRecOut[index].color == state["XformedRecNewColor"] and \
+           index != state["XformedRecSelectedIndex"]:
+          orgRecOut[index].color = state["XformedRecPrevColor"]
+          orgRecOut[index].scale = 1
+          (X, Y) = orgRecOut[index].position 
+          orgRecOut[index].position = (X + 10, Y)
+          break      
+          
+      break
+ 
+         
+       
+def display_XformedRecordings(self): 
+  global state
+  # return the wave files of the Xformed recordings that have been made so far.
+  recordings = os.listdir(path2_transformedVoices)
+  if len(recordings) == 0 :
+    display_noXformedRecordingsCreatedYet_Msg(self)  
+    return 
+  
+  display_XformedRecordings_Msg(self)      
+  state["XformedRecordings"] = "displayed"
+  self.XformedRecordings = list()
+  self.XformedRecordingsOuter = list()
+  x = 25
+  x_offset = 0
+  y = 525
+  y_offset = 0
+  xFactor = 12
+  
+  for index in range(len(recordings)):
+    # passing the buck
+    if x + (len(recordings[index]) * xFactor)  > 1000:
+      x = 25
+      y_offset += 30
+      
+    displayXformedsRecordings(self, recordings, index, x, x_offset, y, y_offset)
+      
+    x += (len(recordings[index]) * xFactor)
+
+    
+            
+# Singer Recordings Listing Logic ************************************************** 
+def remove_singerRecordings(self):
+  global state
+  if state["singerRecordings_Msg"] == "displayed" :
+    self.singerRecordings_Msg.remove_from_parent()
+    state["singerRecordings_Msg"] = "notDisplayed"   
+  else:
+    self.noRecordingSelected_Msg.remove_from_parent()
+    state["noRecordingSelected_Msg"] = "notDisplayed"
+    
+  if state["singerRecordings"] == "displayed":
+    
+    state["singerRecordings"] = "notDisplayed"
+    state["singerRecording"] = "notSelected"
+    state["singerRecSelectedIndex"] = None
+    for index in range(len(self.singerRecordingsOuter)):
+      self.singerRecordingsOuter[index].remove_from_parent()
+      self.singerRecordings[index].remove_from_parent()
+                        
+ 
+                    
+def display_singerRecordings_Msg(self):  
+  global state
+  
+  if state["noRecordingSelected_Msg"] == "displayed" :
+    self.noRecordingSelected_Msg.remove_from_parent()
+    state["noRecordingSelected_Msg"] = "notDisplayed"   
+    
+  if state["singerRecordings_Msg"] != "displayed":
+    # display recordings listing message
+    state["singerRecordings_Msg"] = "displayed"
+    self.singerRecordings_Msg = LabelNode()
+    self.singerRecordings_Msg.color = "#ff0909"
+    self.singerRecordings_Msg.font = ('Papyrus', 40)
+    self.singerRecordings_Msg.text = "Singers To Emulate:"
+    self.singerRecordings_Msg.position = (self.size[0]/2, 575)
+    self.add_child(self.singerRecordings_Msg)  
+    
+
+ 
+def display_noSingerRecordingsCreatedYet_Msg(self):
+  # display the "error" message
+  self.noSingerRecordings = LabelNode()
+  self.noSingerRecordings.color = "#ff0909"
+  self.noSingerRecordings.font = ('Times New Roman', 60)
+  self.noSingerRecordings.text = "No Singer Recordings have been created yet."
+  self.noSingerRecordings.position = (self.size[0]/2, self.size[1]/2)
+  self.add_child(self.noSingerRecordings)  
+
+  
+    
+def displaySingersRecordings(self, recordings, index, x, x_offset, y, y_offset):
+  # name of file to be displayed
+  self.singerRecordings.append(LabelNode())
+  self.singerRecordings[index].font = ('American Typewriter', 15)
+  self.singerRecordings[index].text = recordings[index]
+  self.singerRecordings[index].color = "black"
+  self.singerRecordings[index].anchor_point = (0, 0.5) # lower left
+  #self.singerRecordings[index].anchor_point = (0.5, 0.5) # lower left
+  self.singerRecordings[index].position = (x + 7, y - y_offset)
+   
+  # the "container" around the filename for easy highlighting by the user
+  self.singerRecordingsOuter.append(SpriteNode('pzl:Button1'))
+  self.singerRecordingsOuter[index].anchor_point = (0, 0.5) # lower left
+  (X, Y) = self.singerRecordings[index].size
+  self.singerRecordingsOuter[index].size = (X + 15, Y)    
+  self.singerRecordingsOuter[index].position = (x, y - y_offset)    
+  
+  self.add_child(self.singerRecordingsOuter[index]) 
+  #self.singerRecordingsOuter[index].add_child(self.singerRecordings[index])
+  self.add_child(self.singerRecordings[index]) #text on top of "button"
+ 
+    
+          
+def was_singerRecordingsFileSelected(self, touch):
+  orgRecOut = self.singerRecordingsOuter
+  
+  for index in range(len(orgRecOut)): 
+    # if file selected highlight it.
+    if touch.location in orgRecOut[index].bbox:
+      sound.play_effect('8ve:8ve-tap-double')
+      if index == state["singerRecSelectedIndex"]:
+        return # same file has already been selected
+      state["singerRecPrevColor"] = orgRecOut[index].color
+      orgRecOut[index].color = "yellow"
+      state["singerRecNewColor"] = orgRecOut[index].color
+      orgRecOut[index].scale = 1.1
+      (X, Y) = orgRecOut[index].position 
+      orgRecOut[index].position = (X - 10, Y)
+  
+      # so I know which recording to play if the play button is selected.
+      state["singerRecSelectedIndex"] = index 
+      state["singerRecording"] = "selected"
+      
+      if state["noRecordingSelected_Msg"] == "displayed":
+        display_singerRecordings_Msg(self)      
+      
+      # if a file is selected make sure any previous selected file is unselected
+      for index in range(len(orgRecOut)):
+        if orgRecOut[index].color == state["singerRecNewColor"] and \
+           index != state["singerRecSelectedIndex"]:
+          orgRecOut[index].color = state["singerRecPrevColor"]
+          orgRecOut[index].scale = 1
+          (X, Y) = orgRecOut[index].position 
+          orgRecOut[index].position = (X + 10, Y)
+          break      
+          
+      break
+ 
+         
+       
+def display_singerRecordings(self): 
+  global state
+  # return the wave files of the singer recordings that have been made so far.
+  recordings = os.listdir(path2_voices2emulate)
+  if len(recordings) == 0 :
+    display_noSingerRecordingsCreatedYet_Msg(self)  
+    return 
+  
+  display_singerRecordings_Msg(self)      
+  state["singerRecordings"] = "displayed"
+  self.singerRecordings = list()
+  self.singerRecordingsOuter = list()
+  x = 25
+  x_offset = 0
+  y = 525
+  y_offset = 0
+  xFactor = 12
+  
+  for index in range(len(recordings)):
+    # passing the buck
+    if x + (len(recordings[index]) * xFactor)  > 1000:
+      x = 25
+      y_offset += 30
+      
+    displaySingersRecordings(self, recordings, index, x, x_offset, y, y_offset)
+      
+    x += (len(recordings[index]) * xFactor)
+    
+    
+       
+   
 

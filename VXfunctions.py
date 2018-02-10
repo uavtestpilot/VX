@@ -55,20 +55,34 @@ path2_voices2emulate = './waveFiles/voices2emulate/'
 path2_transformedVoices = './waveFiles/transformedVoices/'
 path2_originalVoices = './waveFiles/originalVoices/'
 
+record = sound.Recorder(path2_originalVoices + 'temporary.wav')
 
- 
+  
 def recordButton(self): 
+  global record
   # The "record" button actually consists of the record and stopRecord buttons
   if state["recordButton"] == "notDisplayed":
     display_recordButton(self)
     if state["stopRecordButton"] == "displayed":
       remove_stopRecordButton(self)
+      if record.recording:
+        record.stop()
+        renameRecording()
   elif state["recordButton"] == "displayed":
     display_stopRecordButton(self)
     remove_recordButton(self)
-  
-  
-  
+    record.record()
+    
+ 
+   
+def renameRecording():   
+  # when recording has stopped rename the temporary file to a unique filename
+  path_file = path2_originalVoices + time.asctime() + '.wav'
+  print(path_file)
+  os.rename('./waveFiles/originalVoices/temporary.wav', path_file)
+    
+
+    
 def playButton(self):
   global song
   # The "play" button actually consists of the play and stopPlay buttons
@@ -360,93 +374,11 @@ def getWaveFile(file2find) :
   else:
     return None
  
-  
-   
+    
      
-def determineFileName():
-  """
-  returns a logical unused fileName to be used for this recording
-  """
-  myTime = time.localtime() # get local date and time
-  
-  # prefix info. with a 0 if not a 2 digit number for sorting/display
-  if len(str(myTime[1])) == 1:
-    myTimeMonth = "0" + str(myTime[1])
-  else:
-    myTimeMonth = str(myTime[1])
-    
-  if len(str(myTime[2])) == 1:
-    myTimeDay = "0" + str(myTime[2])
-  else:
-    myTimeDay = str(myTime[2])
-    
-  if len(str(myTime[3])) == 1:
-    myTimeHours = "0" + str(myTime[3])
-  else:
-    myTimeHours = str(myTime[3])
-    
-  if len(str(myTime[4])) == 1:
-    myTimeMinutes = "0" + str(myTime[4])
-  else:
-    myTimeMinutes = str(myTime[4])
-    
-  if len(str(myTime[5])) == 1:
-    myTimeSeconds = "0" + str(myTime[5])
-  else:
-    myTimeSeconds = str(myTime[5])
-  
-  # now use date and time to create a unique file name.
-  file = "recording_" + myTimeMonth + "_" + myTimeDay + "_" + str(myTime[0]) + "_time_" + myTimeHours + ":" + myTimeMinutes + ":" + myTimeSeconds + ".wav"
-  
-  return file
+
 
 # list recorded files to play or Xform *********************************************
-
-def singerRecordings() :
-  """"
-  return the wave files of singer recordings that are available.
-  """
-  
-  fileList = os.listdir(path2_voices2emulate)
-  
-  fileString = "Singer to emulate recordings:\n\n"
-  for file in fileList:
-    fileString += file + "\n"
-    
-  return fileString
-
-  
-def originalVoices() :
-  """
-  return the wave files of the original recordings that have been made so far.
-  """
-   
-  fileList = os.listdir(path2_originalVoices)
-  
-  fileString = "Original recordings:\n\n"
-  for file in fileList:
-    fileString += file + "\n"
-    
-  return fileString
-  
-  
-  
-def XformedRecordings() :
-  """
-  return the wave files of recordings that have been X-formed.
-  """
-  
-  fileString = "X-formed recordings:\n\n"
-  fileList = os.listdir(path2_transformedVoices)
-  if len(fileList) == 0 :
-    fileString += "No Xformations have been created yet."
-    return fileString
-    
-  for file in fileList:
-    fileString += file + "\n"
-  
-  return fileString
-
 
 def displayTitle(self, title):
   self.title = LabelNode('Georgia')
@@ -872,7 +804,7 @@ def display_originalRecordings(self):
     if x + (len(recordings[index]) * xFactor)  > 1000:
       x = 25
       y_offset += 30
-      
+            
     displayOriginalsRecordings(self, recordings, index, x, x_offset, y, y_offset)
       
     x += (len(recordings[index]) * xFactor)

@@ -29,8 +29,11 @@ V. 0.0.4 Used the scene class to create a more visually pleasing gui.
          
   1. list the wave files available to be played. 02/07/2018 
   2. play a recording. 02/07/2018
+  3. Make a recording. 02/08/2018
+  4. Created a cool X-form "button"
          
-To do............................................................................
+TODO ...............................................................................
+1. Create a cool Xform button.
 View a waveform/recording in the time domain.
 pick a "Voice" recording to emulate,
 create a new transformed recording, etc...

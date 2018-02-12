@@ -30,30 +30,37 @@ V. 0.0.4 Used the scene class to create a more visually pleasing gui.
   1. list the wave files available to be played. 02/07/2018 
   2. play a recording. 02/07/2018
   3. Make a recording. 02/08/2018
-  4. Created a cool X-form "button"
+  4. Created a cool X-form "button" 02/09/2018
+  5. Now able to access the two selected files from my X-form button. 02/10/2018
+     Added more error checking, and the displaying of error messages.
+     Re-arranged the button layout.
+  6. renamed VXfunctions to VXbuttons, created a new VXfunctions to handle to the
+     sound transformation.
          
 TODO ...............................................................................
-1. Create a cool Xform button.
+Convert both wave files to mono if not already
+
 View a waveform/recording in the time domain.
-pick a "Voice" recording to emulate,
-create a new transformed recording, etc...
-gui sliders to control pan and pitch probably should be added  
+
 listing of recordings could be better
-mned and "x" through the "clear screen" buttons.
+
+need and "x" through the "clear screen" buttons.
 '''
 
 from scene import *
 import sound, random, math
 
-# Voice X-formation functions
-from VXfunctions import *
+# The buttons and associated logic for them.
+from VXbuttons import *
+#from VXfunctions import *
+
 """
  singerRecordings, XformedRecordings, getWaveFile, determineFileName, playClickSound, waveViewTD, displayTitle, displaySunburstSprite, displayButtons, moveSprite, displayAlternateButtons, g_altButton, was_originalRecordingsFileSelected
 """
 
 A = Action
   
-class MyScene (Scene):
+class MyScene(Scene):
    
   
   
@@ -63,14 +70,12 @@ class MyScene (Scene):
     
     displaySunburstSprite(self) # display a neat sprite to play around with
     
-    displayTitle(self, "Voice X-former") # display program title
+    displayTitle(self, "    Voice        X-former") # display program title
     
     # display initial control buttons (record, play, list, display, Xform)
     displayButtons(self)
     
-    
-    
-       
+              
     
   
   def did_change_size(self):
@@ -79,10 +84,15 @@ class MyScene (Scene):
   
   
   def update(self):
-    #global song
-    if state["stopPlayButton"] == "displayed":
-      if state["song"].playing == False:
-        playButton(self)
+    if state["stopPlayButton"] == "displayed" and state["song"].playing == False:
+      playButton(self) # remove the stopPlay Button and display the Play button
+        
+    if state["XformingItButton"] == "displayed" and state["song"].playing == False:
+      # remove the XformingIt Button and display the Xform button
+      XformItButton(self)
+      # now play the two wave files given to be transformed together
+      state["originalRecSound"].play()
+      state["singerRecSound"].play()
     
   
   

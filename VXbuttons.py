@@ -43,7 +43,8 @@ state = {"recordButton" : "notDisplayed", "stopRecordButton" : "notDisplayed", \
          
          "song" : None, \
          "originalRecSound" : None, \
-         "singerRecSound" : None}
+         "singerRecSound" : None, \
+         "XformedRecSound" : None}
          
 """
 "*Button" : ["notDisplayed"/"displayed"]
@@ -62,7 +63,9 @@ path2_voices2emulate = './waveFiles/voices2emulate/'
 path2_transformedVoices = './waveFiles/transformedVoices/'
 path2_originalVoices = './waveFiles/originalVoices/'
 
-record = sound.Recorder(path2_originalVoices + 'temporary.wav')
+path2_temp = './waveFiles/temp/' # user won't see or access this one
+
+record = sound.Recorder(path2_temp + 'temporary.wav')
 
 # Voice X-formation functions, import must be done here so it has access to above
 from VXfunctions import XformRecording
@@ -88,7 +91,7 @@ def recordButton(self):
 def renameRecording():   
   # when recording has stopped rename the temporary file to a unique filename
   path_file = path2_originalVoices + time.asctime() + '.wav'
-  os.rename('./waveFiles/originalVoices/temporary.wav', path_file)
+  os.rename('./waveFiles/temp/temporary.wav', path_file)
 
     
             
@@ -101,8 +104,8 @@ def XformItButton(self):
        state["singerRecSelectedIndex"] != None and \
        state["originalRecSelectedIndex"] != None: 
     display_XformingItButton(self)
-    remove_XformItButton(self)
-    state["originalRecSound"], state["singerRecSound"] = XformRecording(self)      
+    remove_XformItButton(self)   
+    state["XformedRecSound"] = XformRecording(self) # played by update method
   elif state["XformItButton"] == "displayed" :
     display_noRecordingSelected_Msg(self, True)
 
@@ -728,9 +731,10 @@ def displayOriginalsRecordings(self, recordings, index, x, x_offset, y, y_offset
   (X, Y) = self.originalRecordings[index].size
   self.originalRecordingsOuter[index].size = (X + 15, Y)    
   self.originalRecordingsOuter[index].position = (x, y - y_offset)    
-  
-  self.add_child(self.originalRecordingsOuter[index]) 
-  #self.originalRecordingsOuter[index].add_child(self.originalRecordings[index])
+  #ground = Node(parent=self)
+  self.add_child(self.originalRecordingsOuter[index])
+  #ground = Node(parent=self.originalRecordingsOuter[index])
+  #originalRecordingsOuter[index].add_child(self.originalRecordings[index])
   self.add_child(self.originalRecordings[index]) #text on top of "button"
  
     

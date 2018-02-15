@@ -34,11 +34,21 @@ V. 0.0.4 Used the scene class to create a more visually pleasing gui.
   5. Now able to access the two selected files from my X-form button. 02/10/2018
      Added more error checking, and the displaying of error messages.
      Re-arranged the button layout.
-  6. renamed VXfunctions to VXbuttons, created a new VXfunctions to handle to the
-     sound transformation.
+     
+V. 0.0.5 Renamed VXfunctions to VXbuttons, created a new VXfunctions  02/11/2018
+         to handle the sound transformation.
+  1. 02/12/2108: stereo files now converted to mono before X-formation processing to
+     keep things simple! 
+  2. Temporary working directory created.  02/14/2018
+     Generation and playing of a new Xformed wave file seems to be reliable now...
+     at least for a few seconds duration...may have to modify for longer recordings.
+     
+ 
+   
+ 
          
 TODO ...............................................................................
-Convert both wave files to mono if not already
+Begin exploring various filtering techniques and fourier math concepts in sound manipulation, may need to use some ML technique.
 
 View a waveform/recording in the time domain.
 
@@ -65,7 +75,7 @@ class MyScene(Scene):
   
   
   def setup(self):
-      
+          
     self.background_color = "#1226ff" # set background to a cool blue
     
     displaySunburstSprite(self) # display a neat sprite to play around with
@@ -90,9 +100,10 @@ class MyScene(Scene):
     if state["XformingItButton"] == "displayed" and state["song"].playing == False:
       # remove the XformingIt Button and display the Xform button
       XformItButton(self)
-      # now play the two wave files given to be transformed together
-      state["originalRecSound"].play()
-      state["singerRecSound"].play()
+      # now play the transformed wave file if it exists
+      if state["XformedRecSound"] != None:
+        state["XformedRecSound"].play()
+      
     
   
   

@@ -1,66 +1,124 @@
 import VXbuttons
 from VXbuttons import *
 import sound, time
+import audioop, numpy
 
 
-# YOU ARE HERE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 
 # Voice X-formation functions
 def XformRecording(self):   
   
   originalRec, singerRec = getWaveFiles(self) # get the wave files the user selected
   
-  # now get the raw data from each of them, convert to mono if stereo
-  originalData, originalNumFrames = getWaveFileData(originalRec)
-  print("originalNumFrames", originalNumFrames, "data", originalData[0:10])
+  # now get the raw data from each of them, 
+  # convert to mono if stereo before returning the data
+  originalData = getWaveFileData(originalRec)
+  print("\noriginal data", originalData[0:10], "...", originalData[-10:]) 
   
-  singerData, singerNumFrames = getWaveFileData(singerRec)
-  print("singerNumFrames", singerNumFrames, "data", singerData[0:10])
+  singerData = getWaveFileData(singerRec)
+  print("\nsinger data", singerData[0:10], "...", singerData[-10:])
   
-  # return sound objects for update method to play when button sound completes
-  return getSoundObjects(originalRec, singerRec) 
+  # YOU ARE HERE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  XformedData = processData(originalData, singerData)
+  print("\nXformed data", XformedData[0:10], "...", XformedData[-10:])
+  
+  fileName = None
+  XformedRec = writeWaveFile(XformedData, path2_transformedVoices, fileName)  
+  
+  return sound.Player(XformedRec)
 
 
+
+
+def processData(original, singer):
+  
+  XformedData = list()
+  for index in range(44100):
+    XformedData.append(singer[index]) 
+  
+  return XformedData
+
+
+
+
+def writeWaveFile(XformedData, path2_transformedVoices, fileName):
+  if fileName == None:
+    path_file = path2_transformedVoices + time.asctime() + '.wav'
+  else :
+    path_file = path2_transformedVoices + fileName 
+    
+  hand = wave.open(path_file, 'wb')  
+  hand.setparams((1, 2, 44100, len(XformedData), 'NONE', 'not compressed'))
+
+  data = numpy.array(XformedData, numpy.int16)
+ 
+  hand.writeframes(data)    
+  hand.close()
+  
+  return path_file # return the Xformed recording to be played
+  
+    
 
      
 def getWaveFileData(waveFile):
-  """
   # read the raw data from the wave file and return it.
-  """
   
-  # print out wave file info.
-  print("\nwave file read:", waveFile) 
   hand = wave.open(waveFile, "rb")
-  print("parameters:", hand.getparams()) # display wave file parameters
-  
-  
+    
   # get data all at once -10 TIMES FASTER THIS WAY!!!
   # but...(run into memory issues this way????)
   bytesObj = hand.readframes(hand.getnframes()) 
-  
+  if hand.getnchannels() == 2:
+    # convert stereo bytesObj into a mono bytesObj
+    bytesObj = audioop.tomono(bytesObj, 2, 1, 1)
+      
+  data = unpackData(hand.getnframes(), bytesObj)         
+  hand.close()    
+  return data
+
+
+
+
+def unpackData(nframes, bytesObj):
   # each bytesObj unpacked must have an associated "h"
   try:
-    data = struct.unpack((str(hand.getnframes()) + "h"), bytesObj)
+    data = struct.unpack(str(nframes) + "h", bytesObj)
   except :
     try:
-      data = struct.unpack((str(2*hand.getnframes()) + "h"), bytesObj)
+      data = struct.unpack(str(2*nframes) + "h", bytesObj)
     except :
       try:
-        data = struct.unpack((str(3*hand.getnframes()) + "h"), bytesObj)
+        data = struct.unpack(str(3*nframes) + "h", bytesObj)
       except :
         try:
-          data = struct.unpack((str(4*hand.getnframes()) + "h"), bytesObj)
+          data = struct.unpack(str(4*nframes) + "h", bytesObj)
         except :
-          print("nothing worked!")
-          
+          print("unpackData - nothing worked!")
+          data = list()
+  return data
+
+
+
+
+def mono(file):
+  fileName = file.split("/").pop()
+  return path2_temp + "mono_" + fileName
  
+  
+    
+  
+     
+def getWaveFiles(self): 
+  originalRec = path2_originalVoices + self.originalRecordings[state["originalRecSelectedIndex"]].text
+  
+  singerRec = path2_voices2emulate + self.singerRecordings[state["singerRecSelectedIndex"]].text
+  
+  return originalRec, singerRec
 
-  hand.close()  
-  
-  return data, hand.getnframes()
-
-  
-  
+    
+ 
+    
 # Old logic for viewing the waveform, never fully implemented ********************** 
 def waveViewTD(waveFile, uiImageView):
   
@@ -143,25 +201,6 @@ waveViewTD(file, image) # now display its attributes and display it in the Time 
           print("nothing worked!")
 """         
 # ********************************************************************************* 
-     
-def getWaveFiles(self): 
-  originalRec = path2_originalVoices + self.originalRecordings[state["originalRecSelectedIndex"]].text
-  
-  singerRec = path2_voices2emulate + self.singerRecordings[state["singerRecSelectedIndex"]].text
-  
-  return originalRec, singerRec
-
-    
- 
-def getSoundObjects(originalRec, singerRec): 
-  global originalRecSound, singerRecSound
-    
-  originalRecSound = sound.Player(originalRec)
-  singerRecSound = sound.Player(singerRec)
-  
-  return originalRecSound, singerRecSound  
-    
-
  
     
      
